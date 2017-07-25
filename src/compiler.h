@@ -23,6 +23,7 @@
 #include "tac.h"
 #include "role.h"
 #include "system.h"
+#include "abstraction/typebasedabs.h"
 
 void compilerInit (const System sys);
 void compilerDone (void);

@@ -21,7 +21,7 @@
 #define SYMBOLS
 
 #include <stdarg.h>
-
+#include <stdio.h>
 //! Size of symbol hashtable.
 /** Optimistically large. Should be a prime, says theory.
  */
@@ -63,6 +63,7 @@ void free_symb (const Symbol s);
 void insert (const Symbol s);
 Symbol lookup (const char *s);
 void symbolPrint (const Symbol s);
+void symbolDelete (Symbol s);
 void symbolPrintAll (void);
 Symbol symbolSysConst (const char *str);
 void symbol_fix_keylevels (void);

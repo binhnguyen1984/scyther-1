@@ -37,8 +37,6 @@ Termlist TERMLISTERROR;
  * Forward declarations
  */
 
-Termlist makeTermlist ();
-
 //! Open termlists code.
 void
 termlistsInit (void)
@@ -313,6 +311,7 @@ termlistConcat (Termlist tl1, Termlist tl2)
   while (scan->next != NULL)
     scan = scan->next;
   scan->next = tl2;
+  tl2->prev = scan;
   return tl1;
 }
 
@@ -363,6 +362,8 @@ termlistDelTerm (Termlist tl)
   else
     {
       newhead = tl->next;
+      if (newhead)
+	newhead->prev = NULL;
     }
   if (tl->next != NULL)
     (tl->next)->prev = tl->prev;

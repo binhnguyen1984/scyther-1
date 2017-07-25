@@ -170,6 +170,57 @@ lookup (const char *s)
   return t;
 }
 
+//!delete a symbol
+void
+symbolDelete (Symbol symb)
+{
+  if (symb == NULL)
+    return;
+  int hv;
+  Symbol t;
+  const char *s = symb->text;
+  if (s != NULL)
+    {
+      Symbol prev = NULL;
+      t = symb_alloc;
+      while (t != NULL)
+	{
+	  if (strcmp (t->text, symb->text) == 0)
+	    {
+	      if (prev == NULL)
+		symb_alloc = t->allocnext;
+	      else
+		prev->allocnext = t->allocnext;
+	      break;
+	    }
+	  prev = t;
+	  t = t->allocnext;
+	}
+
+      hv = hash (s);
+      t = symbtab[hv];
+      prev = NULL;
+      while (t != NULL)
+	{
+	  if (strcmp (t->text, symb->text) == 0)
+	    {
+	      if (prev == NULL)
+		symbtab[hv] = t->next;
+	      else
+		prev->next = t->next;
+	      free (t->text);
+	      free (t);
+	      break;
+	    }
+	  else
+	    {
+	      prev = t;
+	      t = t->next;
+	    }
+	}
+    }
+}
+
 //! Print a symbol.
 void
 symbolPrint (const Symbol s)
@@ -277,7 +328,6 @@ symbolNextFree (Symbol prefixsymbol)
 	   */
 	  newstring = (char *) malloc (slen + 1);
 	  memcpy (newstring, buffer, slen + 1);
-
 	  /* This persistent string can be used to return a fresh symbol */
 
 	  return symbolSysConst (newstring);

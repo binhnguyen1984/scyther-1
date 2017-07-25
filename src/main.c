@@ -48,7 +48,7 @@
  * \section coding Coding conventions
  *
  * Usually, each source file except main.c has an myfileInit() and myfileDone() function
- * available. These allow any initialisation and destruction of required structures.
+ * available. These allow any initialization and destruction of required structures.
  *
  * GNU indent rules are used, but K&R derivatives are allowed as well. Conversion can
  * be done for any style using the GNU indent program.
@@ -74,23 +74,21 @@
 #include "claim.h"
 #include "arachne.h"
 #include "xmlout.h"
-
+#include "attack_check.h"
+#include "abstraction/abssys.h"
 //! The global system state pointer
-System sys;
+System original;
 
 //! Pointer to the tac node container
 extern struct tacnode *spdltac;
 //! Match mode
-extern int mgu_match;
 
 void scanner_cleanup (void);
 void strings_cleanup (void);
 int yyparse (void);
 
-void MC_incRuns (const System sys);
-void MC_incTraces (const System sys);
-void MC_single (const System sys);
 int modelCheck (const System sys);
+void MC_single (const System sys);
 
 //! The main body, as called by the environment.
 int
@@ -108,7 +106,7 @@ main (int argc, char **argv)
 
   /*
    * ------------------------------------------------
-   *     generate system 
+   *     generate system
    * ------------------------------------------------
    */
 
@@ -119,13 +117,12 @@ main (int argc, char **argv)
   colorInit ();
 
   /* start system */
-  sys = systemInit ();
-
+  original = systemInit ();
+  //sys =systemInit(sys);
   /* init knowledge. Needs to go before compiler init for special term init */
-  sys->know = emptyKnowledge ();
-
+  original->know = emptyKnowledge ();
   /* init compiler for this system */
-  compilerInit (sys);
+  compilerInit (original);
 
   /* parse input */
 
@@ -136,30 +133,28 @@ main (int argc, char **argv)
 #endif
 
   /* compile */
-
   // Compile no runs for Arachne and preprocess
   compile (spdltac, 0);
   scanner_cleanup ();
-
 #ifdef DEBUG
   if (DEBUGL (1))
     {
       printf ("\nCompilation yields:\n\n");
       printf ("untrusted agents: ");
-      termlistPrint (sys->untrusted);
+      termlistPrint (original->untrusted);
       printf ("\n");
-      knowledgePrint (sys->know);
-      locVarPrint (sys->locals);
-      protocolsPrint (sys->protocols);
+      knowledgePrint (original->know);
+      locVarPrint (original->locals);
+      protocolsPrint (original->protocols);
 
       printf ("\nInstantiated runs:\n\n");
-      runsPrint (sys);
+      runsPrint (original);
     }
 #endif
 
   /* allocate memory for traces, based on runs */
-  systemStart (sys);
-  sys->traceKnow[0] = sys->know;	// store initial knowledge
+  //systemStart (sys);
+  //sys->traceKnow[0] = sys->know;      // store initial knowledge
 
   /* add parameters to system */
 
@@ -176,9 +171,15 @@ main (int argc, char **argv)
       warning ("Selected output method is %i", switches.output);
     }
 #endif
-
-  arachneInit (sys);
-
+  runVerification (MC_single);
+  //System abssys = getAbstractSystem();
+  //eprintf("abstracted protocol:\n");
+  //protocolsPrint(abssys->protocols);
+  //eprintf("\nEquation list=");
+  //printEquationlist(eql);
+  //eprintf("\n");
+  //MC_single (abssys);
+  //MC_single(sys);
   /*
    * ---------------------------------------
    *  Start real stuff
@@ -194,7 +195,6 @@ main (int argc, char **argv)
   if (DEBUGL (1))
     warning ("Start modelchecking system.");
 #endif
-  MC_single (sys);
 
   /*
    * ---------------------------------------
@@ -214,9 +214,6 @@ main (int argc, char **argv)
    * Now we clean up any memory that was allocated.
    */
 
-  arachneDone ();
-  knowledgeDestroy (sys->know);
-  systemDone (sys);
   colorDone ();
   switchesDone ();
   compilerDone ();
@@ -231,7 +228,6 @@ main (int argc, char **argv)
 
   /* memory clean up? */
   strings_cleanup ();
-
   if (switches.exitCodes)
     {
       return exitcode;
@@ -247,17 +243,31 @@ main (int argc, char **argv)
  * Traditional handywork.
  */
 
+
 void
 MC_single (const System sys)
 {
   /*
    * simple one-time check
    */
-
+  initModelCheck (sys);
+  arachnePrepare ();
+/*
+	bindingInit (sys);
+  arachneInit (sys);
+  arachnePrepare();
   systemReset (sys);		// reset any globals
   systemRuns (sys);		// init runs data
+  */
   modelCheck (sys);
+
+  //arachneDone ();
+  //knowledgeDestroy (sys->know); //close this because atomic terms are shared among abstract models
+  //knowledgeDelete(sys->know);//only shallow deletion is done because abstract systems share the basic knowledge
+  //protocolDelete(sys->protocols);
+  //systemDone (sys);
 }
+
 
 //! Model check the system, given all parameters.
 /*
@@ -282,3 +292,6 @@ modelCheck (const System sys)
 
   return (sys->failed != STATES0);
 }
+
+
+

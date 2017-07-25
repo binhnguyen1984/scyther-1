@@ -25,6 +25,7 @@
 void arachneInit (const System sys);
 void arachneDone ();
 int arachne ();
+void arachnePrepare ();
 int get_semitrace_length ();
 void indentPrint ();
 int isTriviallyKnownAtArachne (const System sys, const Term t, const int run,
@@ -36,5 +37,5 @@ void printSemiState ();
 int countIntruderActions ();
 void role_name_print (const int run);
 void markNoFullProof (const Term tbig, const Term tsmall);
-
+int add_recv_goals (const int, const int, const int);
 #endif

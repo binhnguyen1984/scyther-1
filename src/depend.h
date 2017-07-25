@@ -22,6 +22,29 @@
 
 #include "system.h"
 
+struct depeventgraph
+{
+  //! Flag denoting what it was made for (newrun|newbinding)
+  int fornewrun;
+  //! Number of runs;
+  int runs;
+  //! System where it derives from
+  System sys;
+  //! Number of nodes
+  int n;
+  //! Rowsize
+  int rowsize;
+  //! Graph structure
+  unsigned int *G;
+  //! Zombie dummy push
+  int zombie;
+  //! Previous graph
+  struct depeventgraph *prev;
+};
+
+//! Pointer shorthard
+typedef struct depeventgraph *Depeventgraph;
+
 /*
  * The code here mainly involves an interface for creating graphs etc., but
  * most of it is implicit: we just add dependencies/runs and undo them again

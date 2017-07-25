@@ -26,11 +26,22 @@
 // type <= LEAF means it's a leaf, nkay?
 enum termtypes
 { GLOBAL, VARIABLE, LEAF, ENCRYPT, TUPLE };
+enum isknown
+{
+  UNKNOWN, YES, NO
+};
 
 //! The most basic datatype in the modelchecker.
 /**
  * Describes a single term.
  */
+struct slabel
+{
+  int prot_auth, prop_auth;
+  int prot_sec, prop_sec;
+  int org_auth, org_sec;
+  int tmp_auth, tmp_sec;
+};
 
 struct term
 {
@@ -43,7 +54,13 @@ struct term
   /**
    * \sa GLOBAL, VARIABLE, LEAF, ENCRYPT, TUPLE
    */
+  int abst;			//only used for term pattern
+  int accessible;
   int type;
+  int e_auth, e_sec;
+  int e_contain;		//contains an essential term?
+  int inIK;			//is deducible from IK?
+  struct slabel seclabel;
   //! Data Type termlist (e.g. agent or nonce)
   /** Only for leaves. */
   void *stype;			// list of types
@@ -58,8 +75,8 @@ struct term
    * If this is non-NULL, this leaf term is apparently substituted by
    * this term.
    */
-  struct term *subst;		// only for variable/leaf, substitution term
-
+  struct term *subst, *rolename;	// only for variable/leaf, substitution term
+  struct term *originType;	//point to the term's type it is abstracted from
   union
   {
     //! Pointer to the symbol for leaves
@@ -103,7 +120,7 @@ Term makeTermEncrypt (Term t1, Term t2);
 Term makeTermFcall (Term t1, Term t2);
 Term makeTermTuple (Term t1, Term t2);
 Term makeTermType (const int type, const Symbol symb, const int runid);
-__inline__ Term deVarScan (Term t);
+extern __inline__ Term deVarScan (Term t);
 #define realTermLeaf(t)		(t != NULL && t->type <= LEAF)
 #define realTermTuple(t)	(t != NULL && t->type == TUPLE)
 #define realTermEncrypt(t)	(t != NULL && t->type == ENCRYPT)

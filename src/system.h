@@ -160,6 +160,7 @@ typedef struct system *System;
 
 
 System systemInit ();
+//System systemInit(System sys);
 void systemReset (const System sys);
 void systemRuns (const System sys);
 System systemDuplicate (const System fromsys);

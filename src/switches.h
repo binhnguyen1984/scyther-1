@@ -33,6 +33,7 @@ struct switchdata
   int argc;
   char **argv;
 
+
   // Methods
   int match;			//!< Matching type.
   int tupling;			//!< Tupling is by default 0: right-associative, optionally 1: left-associative.
@@ -59,7 +60,7 @@ struct switchdata
   int intruder;			//!< Enable intruder actions (default)
   int chosenName;		//!< Check for chosen name attacks
   int agentUnfold;		//!< Explicitly unfold for N honest agents and 1 compromised iff > 0
-  int abstractionMethod;	//!< 0 means none, others are specific modes
+  int maxAbstractions;	//!< the maximal number of abstractions that can be generated
   int useAttackBuffer;		//!< Use temporary file for attack storage
 
   // Misc

@@ -129,6 +129,26 @@ list_add (List list, const void *data)
     }
 }
 
+//add to tail, but return tail instead of head
+void
+list_add_tail (List * head, List * lastnode, const void *data)
+{
+  List newnode;
+
+  newnode = list_create (data);
+  if (*lastnode == NULL)
+    {
+      *lastnode = newnode;
+      *head = newnode;
+    }
+  else
+    {
+      newnode->prev = *lastnode;
+      (*lastnode)->next = newnode;
+      *lastnode = newnode;
+    }
+}
+
 //! Add element to list, inserting it at the tail of the list.
 /**
  * @returns the head of the list

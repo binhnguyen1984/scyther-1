@@ -36,6 +36,7 @@ List list_forward (List list);
 List list_insert (List list, const void *data);
 List list_add (List list, const void *data);
 List list_append (List list, const void *data);
+void list_add_tail (List * head, List * list, const void *data);
 List list_delete (List list);
 int in_list (List list, const void *data);
 int list_iterate (List list, int (*func) ());

@@ -41,7 +41,7 @@
 #include "timer.h"
 #include "compiler.h"
 #include "depend.h"
-
+#include "attack_check.h"
 //! When none of the runs match
 #define MATCH_NONE 0
 //! When the order matches
@@ -58,7 +58,8 @@
 
 extern int globalError;
 extern int attack_leastcost;
-
+extern int attack_checking;
+extern int tracelength;
 // Debugging the NI-SYNCH checks
 //#define OKIDEBUG
 
@@ -412,6 +413,7 @@ check_claim_nisynch (const System sys, const int i)
   int result;
   int rid;
   Termmap f, g;
+  Term label;
   Claimlist cl;
   Termlist tl;
 
@@ -423,6 +425,7 @@ check_claim_nisynch (const System sys, const int i)
 
   // map all labels in prec to LABEL_TODO
   g = NULL;
+  label = rd->label;
 
   tl = cl->prec;
   while (tl != NULL)
@@ -470,6 +473,7 @@ check_claim_niagree (const System sys, const int i)
   int result;
   int rid;
   Termmap f, g;
+  Term label;
   Claimlist cl;
   Termlist tl;
 
@@ -481,6 +485,7 @@ check_claim_niagree (const System sys, const int i)
 
   // map all labels in prec to LABEL_TODO
   g = NULL;
+  label = rd->label;
 
   tl = cl->prec;
   while (tl != NULL)
@@ -1081,14 +1086,12 @@ add_claim_specifics (const System sys, const Claimlist cl, const Roledef rd,
 	}
 
       /**
-       * We say that a state exists for secrecy, but we don't really test wheter the claim can
+       * We say that a state exists for secrecy, but we don't really test whether the claim can
        * be reached (without reaching the attack).
        */
       cl->count = statesIncrease (cl->count);
       newgoals = goal_add (rd->message, 0, cl->ev, 0);	// Assumption that all claims are in run 0
-
       flag = callback ();
-
       goal_remove_last (newgoals);
       return flag;
     }
@@ -1145,7 +1148,6 @@ count_false_claim (const System sys)
   sys->current_claim->failed = statesIncrease (sys->current_claim->failed);
 }
 
-
 //! Check properties
 int
 property_check (const System sys)
@@ -1174,8 +1176,15 @@ property_check (const System sys)
 	  indentPrint ();
 	  eprintf ("New cheaper attack found with cost %i.\n", cost);
 	}
+      //store attack in some structure for re-construct attack in the original model
+      if (!attack_checking)
+	{
+	  //eprintf("abstract runs:\n");
+	  //printRuns(sys);
+	  //eprintf("\n");
+	  copyRuns (sys);
+	}
     }
-
   return flag;
 }
 

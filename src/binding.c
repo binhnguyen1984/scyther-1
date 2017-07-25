@@ -38,8 +38,8 @@
 
 static System sys;		//!< local storage of system pointer
 
-extern Protocol INTRUDER;	//!< The intruder protocol
-extern Role I_M;		//!< special role; precedes all other events always
+//extern Protocol INTRUDER;     //!< The intruder protocol
+//extern Role I_M;              //!< special role; precedes all other events always
 
 /*
  *
@@ -83,6 +83,12 @@ binding_destroy (Binding b)
  */
 
 //! Init module
+void
+setBinding (const System mysys)
+{
+  sys = mysys;
+}
+
 void
 bindingInit (const System mysys)
 {

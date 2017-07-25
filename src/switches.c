@@ -83,7 +83,7 @@ switchesInit (int argc, char **argv)
   switches.intruder = true;	// default allows an intruder
   switches.chosenName = false;	// default no chosen name attacks
   switches.agentUnfold = 0;	// default not to unfold agents
-  switches.abstractionMethod = 0;	// default no abstraction used
+  switches.maxAbstractions = 0;	// default no abstractions
   switches.useAttackBuffer = false;	// don't use by default as it does not work properly under windows vista yet
 
   // Misc
@@ -641,6 +641,7 @@ switcher (const int process, int index, int commandline)
 	}
     }
 
+
   /* ==================
    *  Bounding options
    */
@@ -885,21 +886,20 @@ switcher (const int process, int index, int commandline)
 	}
     }
 
-  if (detect (' ', "abstraction-method", 1))
+  //for abstraction, currently there is only one method
+  if (detect (' ', "max-abst", 1))
     {
       if (!process)
 	{
-	  if (switches.expert)
+	 // if (switches.expert)
 	    {
-	      /* Not working yet
-	         helptext ("    --abstraction-method=<int>",
-	         "Abstraction method used. Default: 0 (disabled)");
-	       */
+	         helptext ("--max-abst=<int>",
+	         "Maximal number of abstractions. Default: 0");
 	    }
 	}
       else
 	{
-	  switches.abstractionMethod = integer_argument ();
+	  switches.maxAbstractions =integer_argument ();
 	  return index;
 	}
     }
@@ -1617,59 +1617,73 @@ switcher (const int process, int index, int commandline)
  * This is a public function. It is used for the environment variables but also for the in-specification defines.
  */
 void
-process_switch_buffer (char *args_source)
+process_switch_buffer (char *buf)
 {
-  int arg_string_len;
-
-  if (args_source == NULL)
+  if (buf != NULL)
     {
-      return;
-    }
+      int slen;
 
-  arg_string_len = strlen (args_source);
-  if (arg_string_len > 0)
-    {
-	/**
-	* We scan the args_source here, but assume a stupid upper limit of 100 pieces, otherwise this all becomes fairly vague.
-	*/
-      int max_args = 100;
-      char **args_array;
-      int args_count;
-      char *args_copy;
-      char *scanflag;
-      char *next_arg;
-      int i;
-
-      /* make a safe copy */
-      args_array = malloc (sizeof (char *) * max_args);
-      args_copy = (char *) malloc (arg_string_len + 1);
-      memcpy (args_copy, args_source, arg_string_len + 1);
-
-      for (i = 0; i < max_args; i++)
+      slen = strlen (buf);
+      if (slen > 0)
 	{
-	  args_array[i] = "";
-	}
+	  /**
+	   * We scan the buf here, but assume a stupid upper limit of 100 pieces, otherwise this all becomes fairly vague.
+	   */
+	  int max = 100;
+	  char *argv[100];
+	  int count;
+	  char *args;
+	  char *scanflag;
+	  char *argn;
 
-      scanflag = args_copy;
-      args_count = 0;
-      /* ugly use of assignment in condition */
-      while (args_count < (max_args - 1))
-	{
-	  next_arg = strtok (scanflag, "\t ");
-	  scanflag = NULL;	// needed for strtok() to work properly
-	  if (next_arg != NULL)
+	  /* make a safe copy */
+	  args = (char *) malloc (slen + 1);
+	  memcpy (args, buf, slen + 1);
+
+	  /* warning */
+	  /*
+	     globalError++;
+	     eprintf ("warning: using environment variable SVNSCYTHER ('%s')\n",
+	     args);
+	     globalError--;
+	   */
+
+	  {
+	    int i;
+
+	    i = 0;
+	    while (i < max)
+	      {
+		argv[i] = "";
+		i++;
+	      }
+	  }
+
+	  scanflag = args;
+	  count = 0;
+	  /* ugly use of assignment in condition */
+	  while (count < max)
 	    {
-	      args_count++;
-	      args_array[args_count] = next_arg;
+	      argn = strtok (scanflag, "\t ");
+	      scanflag = NULL;
+	      if (argn != NULL)
+		{
+		  count++;
+		  argv[count] = argn;
+		}
+	      else
+		{
+		  break;
+		}
 	    }
-	  else
-	    {
-	      break;
-	    }
+	  /*
+	     warning ("found %i arguments in SCYTHERFLAGS\n", count);
+	   */
+
+	  switches.argc = count + 1;
+	  switches.argv = argv;
+	  process_switches (false);
 	}
-      switches.argc = args_count + 1;
-      switches.argv = args_array;
-      process_switches (false);
     }
 }
 
@@ -1703,7 +1717,8 @@ process_switches (int commandline)
 	{
 	  printf ("Try '%s --help' for more information, or visit:\n",
 		  progname);
-	  printf (" http://www.cs.ox.ac.uk/people/cas.cremers/scyther/index.html\n");
+	  printf
+	    (" http://www.cs.ox.ac.uk/people/cas.cremers/scyther/index.html\n");
 	  exit (0);
 	}
       else
