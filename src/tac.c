@@ -128,26 +128,22 @@ tacCat (Tac t1, Tac t2)
 Tac
 tacTupleRa (Tac taclist)
 {
-  Tac tc;
-
   /* check for single node */
   if (taclist->next == NULL)
-    {
-      /* just return */
-      tc = taclist;
-    }
+    return taclist;
   else
     {
+      Tac tc;
       /* otherwise, write as (x,(y,(z,..))) */
       tc = tacCreate (TAC_TUPLE);
       tc->t1.tac = taclist;
-      tc->t2.tac = tacTuple (taclist->next);
+      tc->t2.tac = tacTupleRa (taclist->next);
 
       /* unlink list */
       tc->t1.tac->next = NULL;
       tc->t2.tac->prev = NULL;
+      return tc;
     }
-  return tc;
 }
 
 //! List to left-associative tuple
@@ -355,6 +351,13 @@ tacPrint (Tac t)
       printf ("untrusted ");
       tacPrint (t->t1.tac);
       printf (";\n");
+      break;
+    case TAC_USER_SUBTYPE:
+      printf ("subtype ");
+      tacPrint (t->t1.tac);
+      break;
+    case TAC_SUBTYPE:
+      printf ("%s < %s\n", t->t1.sym->text, t->t2.sym->text);
       break;
     default:
       printf ("[??]");

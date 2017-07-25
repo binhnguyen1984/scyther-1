@@ -33,7 +33,6 @@
 #include "error.h"
 #include "role.h"
 
-extern int protocolCount;	// from system.c
 
 //! Allocate memory the size of a roledef struct.
 Roledef
@@ -107,7 +106,7 @@ roledefPrintGeneric (Roledef rd, int print_actor)
 	}
     }
   termPrint (rd->message);
-  eprintf (" )");
+  eprintf (" );");
 }
 
 //! Print a roledef
@@ -202,7 +201,7 @@ roledefInit (int type, Term label, Term from, Term to, Term msg, Claimlist cl)
   newEvent->from = from;
   newEvent->to = to;
   newEvent->message = msg;
-  newEvent->forbidden = NULL;	// no forbidden stuff
+  newEvent->comp = NULL;	// no comp stuff
   newEvent->knowPhase = -1;	// we haven't explored any knowledge yet
   newEvent->claiminfo = cl;	// only for claims
   if (type == RECV)
@@ -211,6 +210,7 @@ roledefInit (int type, Term label, Term from, Term to, Term msg, Claimlist cl)
     newEvent->bound = 1;	// other stuff does not need to be bound
   newEvent->next = NULL;
   newEvent->lineno = 0;
+  newEvent->absMess = NULL;
   return newEvent;
 }
 

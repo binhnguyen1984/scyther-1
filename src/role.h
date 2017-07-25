@@ -105,6 +105,8 @@ struct roledef
   Term to;
   //! Event message.
   Term message;
+  //! correspoding abstracted message
+  Term absMess;
   //! Pointer to next roledef node.
   struct roledef *next;
 
@@ -115,7 +117,7 @@ struct roledef
   /**
    * For send this means that the send is allowed if it is NULL, otherwise it is blocked.
    */
-  Knowledge forbidden;
+  Knowledge comp;
   //! knowledge transitions counter.
   int knowPhase;
 

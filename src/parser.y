@@ -94,6 +94,10 @@ List findMacroDefinition(Symbol s)
 %token 		MACRO
 %token 		MATCH
 %token 		NOT
+%token          SUBTYPING
+%token		ENV
+%token		EQUATIONS
+%token		ESSENTIAL
 
 %type	<tac>	spdlcomplete
 %type	<tac>	spdlrep
@@ -116,6 +120,14 @@ List findMacroDefinition(Symbol s)
 %type	<tac>	knowsdecl
 %type	<tac>	macrodecl
 %type	<tac>	options
+%type	<tac>	subtyping
+%type	<tac>	subtypinglist
+%type 	<tac> 	equation
+%type 	<tac>	eqlist
+%type 	<tac> 	pattern
+%type 	<tac>	patternlist
+%type 	<tac>	typelist
+%type 	<tac>	typedeclare
 
 %type   <value>	singular
 
@@ -164,6 +176,26 @@ spdl		: UNTRUSTED termlist ';'
 			t->t1.tac = $2;
 			$$ = t;
 		  }
+		| SUBTYPING subtypinglist ';'
+			{
+			Tac t = tacCreate(TAC_USER_SUBTYPE);
+			t->t1.tac = $2;
+			$$ = t;			
+			}
+		| ENV ':' typelist
+			{
+				Tac t = tacCreate(TAC_ENV);
+				t->t1.tac = $3;
+				$$ = t;
+			}
+
+		| EQUATIONS ':' eqlist
+			{
+				Tac t = tacCreate(TAC_EQUATIONS);
+				t->t1.tac = $3;
+				$$ = t;
+			}
+
 		| declaration
 		  {
 		  	$$ = $1;
@@ -173,6 +205,92 @@ spdl		: UNTRUSTED termlist ';'
 		  	$$ = $1;
 		  }
 		;
+subtyping	: ID '<' ID
+			{
+				Tac t = tacCreate(TAC_SUBTYPE);
+				t->t1.sym=$1;
+				t->t2.sym=$3;
+				$$=t;
+			};
+subtypinglist	:  subtyping{}
+				| subtyping ',' subtypinglist
+				{$$ = tacCat($1,$3);};
+
+
+patternlist	: pattern
+		  {}
+		| pattern ',' patternlist
+		  {	$$ = tacCat($1,$3); }
+		;
+
+pattern		: ID '(' patternlist ')'
+			{
+			  	Tac t = tacCreate(TAC_STRING);
+				t->t1.sym = $1;
+				$$ = tacJoin(TAC_FCALL,tacTuple($3),t,NULL);
+			}
+
+		| '{' patternlist '}' pattern
+		  {
+		  	$$ = tacJoin(TAC_ENCRYPT,tacTuple($2),$4,NULL);
+		  }
+		| '(' patternlist ')'
+		  { 
+		  	$$ = tacTuple($2);
+		  }
+		| '[' term ']'
+			{
+				Tac t = tacCreate(TAC_ABSTRACT);
+				t->t1.tac = $2;
+				$$ = t;
+			};
+		| basicterm{};
+
+equation	: '@' pattern '=' pattern ';'
+			{
+				Tac t= tacCreate(TAC_PERSISTENT_EQUATION);
+				t->t1.tac = $2;
+				t->t2.tac = $4;
+				$$ = t;
+			}
+
+		| pattern '=' pattern ';'
+			{
+				Tac t = tacCreate(TAC_EQUATION);
+				t->t1.tac = $1;
+				t->t2.tac = $3;
+				$$ = t;
+			};
+
+eqlist		: /* empty */
+			{
+				$$=NULL;
+			}
+		| equation  eqlist
+			{
+				$$ = tacCat($1,$2);
+			};
+
+
+typedeclare	: basictermlist ':' term ';'
+			{
+				Tac t = tacCreate(TAC_TYPING);
+				t->t1.tac = $1;
+				t->t2.tac = $3;
+				$$ = t;
+			};
+
+typelist	: /* empty */
+			{
+				$$=NULL;
+			}
+		 | typedeclare  typelist
+			{
+				$$ = tacCat($1,$2);
+			} ;
+
+
+
 
 options		: OPTION TEXT optclosing
 		  {
@@ -368,6 +486,12 @@ declaration	: secretpref CONST basictermlist typeinfo1 ';'
 		  	t->t1.tac= $2;
 			$$ = t;
 		  }
+		| ESSENTIAL basictermlist ';'
+			{
+				Tac t = tacCreate(TAC_ESSENTIAL);
+				t->t1.tac = $2;
+				$$ = t;				
+			}
 		| secretpref funcORhash basictermlist ';'
 		  {	Tac t = tacCreate(TAC_HASHFUNCTION);
 		  	t->t1.tac = $3;

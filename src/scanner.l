@@ -181,6 +181,11 @@ hashfunction	{ return HASHFUNCTION; }
 knows		{ return KNOWS; }
 trusted		{ return TRUSTED; }
 option 		{ return OPTION; }
+subtype 	{ return SUBTYPING;}
+environment	{ return ENV;}
+equations	{ return EQUATIONS; }
+essential	{ return ESSENTIAL;}
+
 {text} 		{ 
 			int len;
 			char *dest;

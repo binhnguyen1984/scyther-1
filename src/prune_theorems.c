@@ -38,7 +38,7 @@
 #include "type.h"
 
 extern Protocol INTRUDER;
-extern int proofDepth;
+//extern int proofDepth;
 extern int max_encryption_level;
 
 
@@ -62,6 +62,9 @@ correctLocalOrder (const System sys)
 
 	  // t is a term from r2 that occurs in r1
 	  r2 = TermRunid (t);
+	  //eprintf("check run:");
+	  //printRuns(sys);
+	  //eprintf("\n");
 	  e1 = firstOccurrence (sys, r1, t, ANYEVENT);
 	  if (e1 >= 0)
 	    {
@@ -258,30 +261,35 @@ multipleRolePrune (const System sys)
       p = sys->runs[run].protocol;
       if ((p != INTRUDER) && (!isHelperProtocol (p)))
 	{
-	  Term rolename;
-	  Term agent;
-	  Termlist tl;
+	  Role r;
 
-	  rolename = sys->runs[run].role->nameterm;
-	  agent = agentOfRun (sys, run);
-
-	  // Does this agent already occur yet in the list?
-	  for (tl = agentrole; tl != NULL; tl = (tl->next)->next)
+	  for (r = p->roles; r != NULL; r = r->next)
 	    {
-	      if (isTermEqual (agent, tl->term))
+	      Term role, agent;
+	      Termlist tl;
+
+	      // Find mapping role->agent
+	      role = r->nameterm;
+	      agent = agentOfRunRole (sys, run, role);
+
+	      // Does this agent already occur yet in the list?
+	      for (tl = agentrole; tl != NULL; tl = (tl->next)->next)
 		{
-		  if (!isTermEqual (rolename, (tl->next)->term))
+		  if (isTermEqual (agent, tl->term))
 		    {
-		      // Same agent, but different role! This is not allowed.
-		      termlistDelete (agentrole);	// cleanup
-		      return true;
+		      if (!isTermEqual (role, (tl->next)->term))
+			{
+			  // Same agent, but different role! This is not allowed.
+			  termlistDelete (agentrole);	// cleanup
+			  return true;
+			}
 		    }
 		}
+	      // Does not occur yet, so add
+	      // Note we add the elements in front, so we need to reverse the order
+	      agentrole = termlistPrepend (agentrole, role);
+	      agentrole = termlistPrepend (agentrole, agent);
 	    }
-	  // Does not occur yet, so add
-	  // Note we add the elements in front, so we need to reverse the order
-	  agentrole = termlistPrepend (agentrole, rolename);
-	  agentrole = termlistPrepend (agentrole, agent);
 	}
     }
   termlistDelete (agentrole);

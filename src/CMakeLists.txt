@@ -22,6 +22,21 @@ set (Scyther_sources
 	tempfile.c
 	termlist.c termmap.c term.c timer.c type.c warshall.c xmlout.c
 	parser.c scanner.c
+	attack_check.c
+	abstraction/absfunc.c
+	abstraction/abssys.c
+	abstraction/advfunc.c
+	abstraction/avrem.c
+	abstraction/eqlist.c
+	abstraction/heuristic.c
+	abstraction/patfunc.c
+	abstraction/protfunc.c
+	abstraction/redabs.c
+	abstraction/safecheck.c
+	abstraction/subtype.c
+	abstraction/termfunc.c
+	abstraction/time.c
+	abstraction/typebasedabs.c
   )
 
 # If we are in a debug mode we want to be strict

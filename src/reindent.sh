@@ -5,6 +5,6 @@
 # Apparently unstable behaviour is possible; a stupid fix for my
 # concrete problem was to always run it twice.
 #
-indent *.c *.h
-indent *.c *.h
+indent *.c *.h abstraction/*.c abstraction/*.h
+indent *.c *.h abstraction/*.c abstraction/*.h
 

@@ -68,12 +68,10 @@ Term AGENT_Bob;
 Term AGENT_Charlie;
 Term AGENT_Dave;
 Term AGENT_Eve;
-Term AGENT_Simon;
-Term AGENT_Pete;
 Term TERM_PK;
 Term TERM_SK;
 Term TERM_K;
-
+Term TERM_NIL;
 Term LABEL_Match;
 
 Termlist CLAIMS_dep_prec;
@@ -86,7 +84,6 @@ void
 specialTermInit (const System sys)
 {
   /* Init system constants */
-
   langhide (TERM_Type, "Type");
   langhide (TERM_Hidden, "Hidden");
   langhide (TERM_Claim, "Claim");
@@ -94,13 +91,13 @@ specialTermInit (const System sys)
   langhide (TERM_CoNew, "Co(New)");
   langhide (TERM_DeEx, "DeEx");
   langhide (TERM_DeNew, "DeNew");
-
   langcons (TERM_Agent, "Agent", TERM_Type);
   langcons (TERM_Function, "Function", TERM_Type);
   langcons (TERM_Nonce, "Nonce", TERM_Type);
   langcons (TERM_Ticket, "Ticket", TERM_Type);
   langcons (TERM_SessionKey, "SessionKey", TERM_Type);
   langcons (TERM_Data, "Data", TERM_Type);
+  langcons (TERM_NIL, "NIL", TERM_Ticket);
 
   langcons (CLAIM_Secret, "Secret", TERM_Claim);
   langcons (CLAIM_Alive, "Alive", TERM_Claim);
@@ -146,16 +143,12 @@ specialTermInitAfter (const System sys)
   langcons (AGENT_Charlie, "Charlie", TERM_Agent);
   langcons (AGENT_Dave, "Dave", TERM_Agent);
   langcons (AGENT_Eve, "Eve", TERM_Agent);
-  langcons (AGENT_Simon, "Simon", TERM_Agent);
-  langcons (AGENT_Pete, "Pete", TERM_Agent);
 
   knowledgeAddTerm (sys->know, AGENT_Alice);
   knowledgeAddTerm (sys->know, AGENT_Bob);
   knowledgeAddTerm (sys->know, AGENT_Charlie);
   knowledgeAddTerm (sys->know, AGENT_Dave);
   knowledgeAddTerm (sys->know, AGENT_Eve);
-  knowledgeAddTerm (sys->know, AGENT_Simon);
-  knowledgeAddTerm (sys->know, AGENT_Pete);
 
   // Make special Eve keys and add to initial knowledge
   SKE = makeTermEncrypt (AGENT_Eve, TERM_SK);
