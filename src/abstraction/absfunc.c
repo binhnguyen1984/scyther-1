@@ -7,6 +7,37 @@
 #include "absfunc.h"
 //abstraction
 
+/*
+ * return True if t's fields occurs as fields of u
+ */
+static int asField(Term t, Term u)
+{
+	if(isTermTuple(u))
+	{
+		if(!isTermTuple(t))
+			return asField(t, TermOp1(u))||asField(t,TermOp2(u));
+		else return asField(TermOp1(t),u) && asField(TermOp2(t),u);
+	}
+	return isTermEqual(t,u);
+}
+/*
+ * check if term t is different from u
+ * note that t is equal to u if it can be obtained from u by reordering its fields
+ * and removing multiple occurrences of fields
+ */
+static int isEqual(Term t, Term u)
+{
+	if(isTermLeaf(t)||isTermLeaf(u))
+		return isTermEqual(t,u);
+	if(t->type!=u->type) return 0;
+	if(isTermTuple(t))
+	{
+		return asField(TermOp1(t), u) && asField(TermOp2(t),u) &&
+			   asField(TermOp1(u),t) && asField(TermOp2(u),t);
+	}
+	return isEqual(TermOp(t), TermOp(u)) &&
+			   isEqual(TermKey(t), TermKey(u));
+}
 int
 trivialEquationlist (Eqlist eql)
 {
@@ -43,9 +74,16 @@ tryAbstractProt1 (int (*safecheck) (Protocol), Term (*absfunc) (Term),
 		  //eprintf("\n");
 
 	      if (roledef->absMess == NULL)
-		roledef->absMess = absfunc (roledef->message);
-	      if (!isTermEqual (roledef->message, roledef->absMess))
-		succeed = 1;
+	    	  roledef->absMess = absfunc (roledef->message);
+		  eprintf(" original message ");
+		  printTerm(roledef->message);
+		  eprintf("\n");
+		  eprintf(" abstract message ");
+		  printTerm(roledef->absMess);
+		  eprintf("\n");
+
+	      if (!isEqual (roledef->message, roledef->absMess))
+	    	  succeed = 1;
 	    }
 		  //eprintf("-->");
 		  //printTerm(roledef->absMess);
