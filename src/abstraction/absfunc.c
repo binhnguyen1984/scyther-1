@@ -75,13 +75,6 @@ tryAbstractProt1 (int (*safecheck) (Protocol), Term (*absfunc) (Term),
 
 	      if (roledef->absMess == NULL)
 	    	  roledef->absMess = absfunc (roledef->message);
-		  eprintf(" original message ");
-		  printTerm(roledef->message);
-		  eprintf("\n");
-		  eprintf(" abstract message ");
-		  printTerm(roledef->absMess);
-		  eprintf("\n");
-
 	      if (!isEqual (roledef->message, roledef->absMess))
 	    	  succeed = 1;
 	    }
