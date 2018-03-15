@@ -1,30 +1,19 @@
-The Scyther tool repository
+The Scyther-abstraction tool repository
 ===========================
 
-This README describes the organization of the repository of the Scyther
-tool for security protocol analysis. Its intended audience are
-interested users and future developers of the Scyther tool, as well as
-protocol modelers. For installation and usage instructions of the
-Scyther tool see:
+This README describes the organization of the repository of the Scyther-abstraction
+tool for security protocol analysis. The tool integrates a protocol abstraction mechanism with the Scyther verifier in order to speedup the verification tasks. In particular, the tool applies different abstraction techniques to aggressively simplify an input protocol specification before feeding it to Scyther. As the abstract models have simpler message structures and smaller message sizes than their original specifications, the tool enables Scyther to achieve unbounded verification for various protocols which without abstraction already render Scyther timeout or memory exhaustion for even small numbers of threads. For installation and usage instructions of the Scyther tool see:
 <http://www.cs.ox.ac.uk/people/cas.cremers/scyther/index.html>.
 
 Installing from source
 ----------------------
-
-We use Linux during the development of Scyther, but development on
-Windows and MAC OS X should be equally feasible. Note that the below
-instructions are written from a Linux/Ubuntu perspective, and probably
-need modifications for other platforms.
-
-Scyther is written partly in Python (for the GUI, using wxPython) and
-partly in C (for the backend). 
 
 In order to run the tool from a repository checkout, it is required to
 compile the C sources into a working binary for the backend.  The
 simplest way to achieve this is to run the `build.sh` script in the
 `./src` directory. This script compiles a binary version of the tool on
 the native platform. Thus, in the Linux case, it should produce
-`./src/scyther-linux`. This file is automatically copied to the related
+`./src/scyther-abst`. This file is automatically copied to the related
 directory under `./gui`, and if successful you can attempt to run
 `./gui/scyther-gui.py` to use the graphical user interface.
 
@@ -53,8 +42,7 @@ us a pull request.
 Manual
 ------
 
-We are currently rewriting the manual. The current (incomplete) snapshot
-of the manual can be found in the following location:
+The current (incomplete) snapshot of the manual can be found in the following location:
 
   * [./gui/scyther-manual.pdf](gui/scyther-manual.pdf)
 
@@ -66,10 +54,11 @@ The protocol models have the extension `.spdl` and can be found in the following
 
   * [./gui/Protocols](gui/Protocols), containing the officially released models, and
   * [./testing](testing), containing models currently under development.
+  * models: containing experimental models used in our publication POST 2015.
 
-License
--------
-
-Currently these Scyther sources are licensed under the GPL 2, as indicated in
-the source code. Contact Cas Cremers if you have any questions.
-
+Publications related to Scyther-Abstraction
+--------------------------------------------
+Binh Thanh Nguyen and Christoph Sprenger. Sound Security Protocol Transformations. POST 2013.
+Binh Thanh Nguyen and Christoph Sprenger. Abstractions for Security Protocol Verification. POST 2015.
+Binh Thanh Nguyen. Sound Abstractions for Security Protocol Verification. Ph.D. Thesis No. 22674, Department of Computer Science, ETH Zurich, May 2015.
+Binh Thanh Nguyen, Christoph Sprenger, and Cas Cremers. Abstractions for Security Protocol Verification. Submitted to JCS, 2015.
