@@ -54,11 +54,14 @@ The protocol models have the extension `.spdl` and can be found in the following
 
   * [./gui/Protocols](gui/Protocols), containing the officially released models, and
   * [./testing](testing), containing models currently under development.
-  * models: containing experimental models used in our publication POST 2015.
+  * [./experiment], containing models used in our publication POST 2015.
 
 Publications related to Scyther-Abstraction
 --------------------------------------------
 Binh Thanh Nguyen and Christoph Sprenger. Sound Security Protocol Transformations. POST 2013.
+
 Binh Thanh Nguyen and Christoph Sprenger. Abstractions for Security Protocol Verification. POST 2015.
+
 Binh Thanh Nguyen. Sound Abstractions for Security Protocol Verification. Ph.D. Thesis No. 22674, Department of Computer Science, ETH Zurich, May 2015.
+
 Binh Thanh Nguyen, Christoph Sprenger, and Cas Cremers. Abstractions for Security Protocol Verification. Submitted to JCS, 2015.
