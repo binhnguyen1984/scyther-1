@@ -39,7 +39,7 @@ Note that welcome all contributions, e.g., further protocol models. Just send
 us a pull request.
 
 
-Manual
+Manual for protocol specification in Scyther
 ------
 
 The current (incomplete) snapshot of the manual can be found in the following location:
