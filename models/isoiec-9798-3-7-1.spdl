@@ -1,0 +1,106 @@
+/* Copyright (C) 1991-2012 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, see
+   <http://www.gnu.org/licenses/>.  */
+/* This header is separate from features.h so that the compiler can
+   include it implicitly at the start of every compilation.  It must
+   not itself include <features.h> or any other header that includes
+   <features.h> because the implicit include comes before any feature
+   test macros that may be defined in a source file before it first
+   explicitly includes a system header.  GCC knows the name of this
+   header in order to preinclude it.  */
+/* Define __STDC_IEC_559__ and other similar macros.  */
+/* Copyright (C) 2005 Free Software Foundation, Inc.
+   This file is part of the GNU C Library.
+
+   The GNU C Library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or (at your option) any later version.
+
+   The GNU C Library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with the GNU C Library; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+   02111-1307 USA.  */
+/* We do support the IEC 559 math functionality, real and complex.  */
+/* wchar_t uses ISO/IEC 10646 (2nd ed., published 2011-03-15) /
+   Unicode 6.0.  */
+/* We do not support C11 <threads.h>.  */
+/*
+ * Modeled from ISO standard
+ *
+ * signature
+ * ttp
+ * five-pass
+ * mutual
+ *
+ * B initiates and A communicates with T
+ *
+ * parameters:
+ *
+ * 	NAME
+ * 	IA
+ * 	IB
+ * 	ResA
+ * 	ResB
+ * 	TokenAB
+ * 	TokenBA (although identical in both cases)
+ * 	TokenTA
+ *
+ */
+protocol isoiec-9798-3-7-1(A,B,T)
+{
+ role A
+ {
+  fresh Ra,Rpa: Nonce;
+  var Rb: Nonce;
+  var Text1,Text3,Text4,Text5,Text8,Text9: Ticket;
+  fresh Text2,Text6,Text7: Ticket;
+  recv_1(B,A, Rb,B,Text1 );
+  send_2(A,T, Rpa,Rb,A,Text2 );
+  recv_3(T,A, Text5, A,pk(A),B,pk(B),{Rpa,B,pk(B),Text4}sk(T),{Rb,A,pk(A),Text3}sk(T) );
+  claim(A,Running,B,Ra,Rb);
+  send_4(A,B, A, Text7,Ra,A,pk(A),{Rb,A,pk(A),Text3}sk(T),{Rb,Ra,B,A,Text6}sk(A) );
+  recv_5(B,A, Ra,Rb,Text9,{A,Ra,Rb,B,Text8}sk(B) );
+  claim(A,Commit,B,Ra,Rb);
+  claim(A,Alive);
+ }
+ role B
+ {
+  fresh Text1,Text8,Text9: Ticket;
+  fresh Rb: Nonce;
+  var Text3,Text4,Text6,Text7: Ticket;
+  var Ra,Rpa: Nonce;
+  send_1(B,A, Rb,B,Text1 );
+  recv_4(A,B, A, Text7,Ra,A,pk(A),{Rb,A,pk(A),Text3}sk(T),{Rb,Ra,B,A,Text6}sk(A) );
+  claim(B,Running,A,Ra,Rb);
+  send_5(B,A, Ra,Rb,Text9,{A,Ra,Rb,B,Text8}sk(B) );
+  claim(B,Commit,A,Ra,Rb);
+  claim(B,Alive);
+ }
+ role T
+ {
+  var Rpa,Rb: Nonce;
+  var Text2: Ticket;
+  fresh Text3,Text4,Text5: Ticket;
+  recv_2(A,T, Rpa,Rb,A,Text2 );
+  send_3(T,A, Text5, A,pk(A),B,pk(B),{Rpa,B,pk(B),Text4}sk(T),{Rb,A,pk(A),Text3}sk(T) );
+ }
+}

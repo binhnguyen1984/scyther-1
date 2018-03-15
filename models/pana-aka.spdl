@@ -1,0 +1,51 @@
+hashfunction prf, kdf, mac;
+hashfunction h;
+const inc,dec: Function;
+inversekeys (inc,dec);
+const empty;
+usertype EAP-Msg-Code;
+usertype EAP-Req-Resp-Type;
+const EAP-Request,EAP-Response,EAP-Success,EAP-Failure: EAP-Msg-Code;
+const Identity: EAP-Req-Resp-Type;
+hashfunction f1, f2, f3, f4, f5; hashfunction prf1, prf2; const Add: Function;const Sub: Function;inversekeys(Add, Sub);
+const aka-method: EAP-Req-Resp-Type;
+usertype PANA-Msg-Code;
+usertype PANA-Req-Resp-Type;
+const PANA-Request,PANA-Response,PANA-Success,PANA-Failure: PANA-Msg-Code;
+protocol pana-eap-aka(I, R)
+{
+ role I {
+   fresh rand, sqn: Nonce; send_!0(I, I, sqn); fresh EAP-msgnum: Nonce; send_!0e(I,I,EAP-msgnum); fresh PANA-msgnum, PAA-nonce: Nonce; var PaC-nonce: Nonce; send_!0p(I,I,PANA-msgnum);
+     send_1(I,R,PANA-Request,PANA-msgnum);
+     recv_2(R,I,PANA-Response,PANA-msgnum);
+     send_3(I,R,PANA-Request,inc(PANA-msgnum),PAA-nonce,EAP-Request,EAP-msgnum,Identity,I);
+     recv_4(R,I,PANA-Response,inc(PANA-msgnum),PaC-nonce,EAP-Response,EAP-msgnum,Identity,R);
+    claim(I,Running,R,rand, sqn);
+     send_5(I,R,PANA-Request,inc(inc(PANA-msgnum)),EAP-Request,inc(EAP-msgnum),aka-method,rand, Add(sqn, f5(k(I,R), rand)), f1(k(I,R), sqn, rand));
+     recv_6(R,I,PANA-Response,inc(inc(PANA-msgnum)),EAP-Response,inc(EAP-msgnum),aka-method,f2(k(I,R), rand));
+     send_7(I,R,PANA-Request,inc(inc(inc(PANA-msgnum))),PANA-Success,EAP-Success,inc(inc(EAP-msgnum)),h(prf(prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))),PANA-msgnum,PaC-nonce,PAA-nonce),PANA-Request,inc(inc(inc(PANA-msgnum))),PANA-Success,EAP-Success,inc(inc(EAP-msgnum))));
+     recv_8(R,I,PANA-Response,inc(inc(inc(PANA-msgnum))),h(prf(prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))),PANA-msgnum,PaC-nonce,PAA-nonce),PANA-Response,inc(inc(inc(PANA-msgnum)))));
+    claim(I,Secret,prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))));
+    claim(I,Commit,R,rand, sqn);
+    claim(I,Secret, k(I,R));
+    claim(I,Alive);
+    claim(I,Weakagree);
+ }
+ role R {
+   var rand, sqn: Nonce; var EAP-msgnum: Nonce; var PANA-msgnum, PAA-nonce: Nonce; fresh PaC-nonce: Nonce;
+     recv_1(I,R,PANA-Request,PANA-msgnum);
+     send_2(R,I,PANA-Response,PANA-msgnum);
+     recv_3(I,R,PANA-Request,inc(PANA-msgnum),PAA-nonce,EAP-Request,EAP-msgnum,Identity,I);
+     send_4(R,I,PANA-Response,inc(PANA-msgnum),PaC-nonce,EAP-Response,EAP-msgnum,Identity,R);
+     recv_5(I,R,PANA-Request,inc(inc(PANA-msgnum)),EAP-Request,inc(EAP-msgnum),aka-method,rand, Add(sqn, f5(k(I,R), rand)), f1(k(I,R), sqn, rand));
+    claim(R,Running,I,rand, sqn);
+     send_6(R,I,PANA-Response,inc(inc(PANA-msgnum)),EAP-Response,inc(EAP-msgnum),aka-method,f2(k(I,R), rand));
+     recv_7(I,R,PANA-Request,inc(inc(inc(PANA-msgnum))),PANA-Success,EAP-Success,inc(inc(EAP-msgnum)),h(prf(prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))),PANA-msgnum,PaC-nonce,PAA-nonce),PANA-Request,inc(inc(inc(PANA-msgnum))),PANA-Success,EAP-Success,inc(inc(EAP-msgnum))));
+     send_8(R,I,PANA-Response,inc(inc(inc(PANA-msgnum))),h(prf(prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))),PANA-msgnum,PaC-nonce,PAA-nonce),PANA-Response,inc(inc(inc(PANA-msgnum)))));
+    claim(R,Secret,prf2(h(R,sqn,rand,h(R,f4(k(I,R), rand),f3(k(I,R), rand)))));
+    claim(R,Commit,I,rand, sqn);
+    claim(R,Secret, k(I,R));
+    claim(R,Alive);
+    claim(R,Weakagree);
+ }
+}
