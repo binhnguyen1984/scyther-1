@@ -3,8 +3,8 @@ The Scyther-abstraction tool repository
 
 This README describes the organization of the repository of the Scyther-abstraction
 tool for security protocol analysis. 
-
 The tool integrates a protocol abstraction mechanism with the Scyther verifier in order to speedup the verification tasks. In particular, the tool applies different abstraction techniques to aggressively simplify an input protocol specification before feeding it to Scyther. As the abstract models have simpler message structures and smaller message sizes than their original specifications, the tool enables Scyther to achieve unbounded verification for various protocols which without abstraction already render Scyther timeout or memory exhaustion for even small numbers of threads. 
+
 For installation and usage instructions of the Scyther tool see:
 <http://www.cs.ox.ac.uk/people/cas.cremers/scyther/index.html>.
 
