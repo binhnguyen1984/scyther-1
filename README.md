@@ -16,9 +16,7 @@ compile the C sources into a working binary for the backend.  The
 simplest way to achieve this is to run the `build.sh` script in the
 `./src` directory. This script compiles a binary version of the tool on
 the native platform. Thus, in the Linux case, it should produce
-`./src/scyther-abst`. This file is automatically copied to the related
-directory under `./gui`, and if successful you can attempt to run
-`./gui/scyther-gui.py` to use the graphical user interface.
+`./src/scyther-abst`. 
 
 The build process depends on the following
 (Debian/Ubuntu) packages:
